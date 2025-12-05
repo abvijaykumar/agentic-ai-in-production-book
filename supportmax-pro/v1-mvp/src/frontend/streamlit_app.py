@@ -43,16 +43,27 @@ with st.sidebar:
         st.rerun()
         
     st.markdown("---")
-    st.header("🧪 Test Scenarios")
-    
-    if st.button("📚 Test RAG (Docs)"):
+    st.markdown("### 📚 Knowledge Base (RAG)")
+    if st.button("Query: API Rate Limits"):
         st.session_state.prompt_input = "How do I configure the API rate limits?"
-            
-    if st.button("🔧 Test Technical Delegation"):
+    if st.button("Query: Reset Password"):
+        st.session_state.prompt_input = "How do I reset my password?"
+
+    st.markdown("### 🔧 Technical Support (Delegation)")
+    if st.button("Query: 500 Error"):
         st.session_state.prompt_input = "I'm getting a 500 error when calling the /chat endpoint with a large payload."
-            
-    if st.button("🎫 Test Ticket Creation"):
+    if st.button("Query: Connection Timeout"):
+        st.session_state.prompt_input = "My WebSocket connection keeps dropping every 5 minutes."
+
+    st.markdown("### 🎫 Ticket Creation")
+    if st.button("Query: Account Locked"):
         st.session_state.prompt_input = "My account is locked and I need immediate help."
+    if st.button("Query: Feature Request"):
+        st.session_state.prompt_input = "I want to request a dark mode for the dashboard."
+
+    st.markdown("### 🔒 Security & Compliance")
+    if st.button("Query: PII Redaction Test"):
+        st.session_state.prompt_input = "My email is user@example.com and phone is 555-0199. Please update my contact info."
 
     st.markdown("---")
     st.caption(f"Session ID: {st.session_state.user_id}")

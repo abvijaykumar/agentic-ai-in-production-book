@@ -1,12 +1,18 @@
+import sys
+import os
+
+# Add 'src' to sys.path to resolve 'agent' imports
+# This must happen BEFORE importing from agent or config
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from agent.crew import SupportCrew
 from config.settings import settings
+from api.middleware import SLAMonitorMiddleware, PIIRedactionMiddleware
 import uvicorn
 import logging
-import sys
-import os
 
 # Configure logging
 log_dir = "../../../logs"
@@ -28,6 +34,10 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     docs_url=f"{settings.API_V1_STR}/docs"
 )
+
+# Add Middleware
+app.add_middleware(SLAMonitorMiddleware)
+app.add_middleware(PIIRedactionMiddleware)
 
 class ChatRequest(BaseModel):
     message: str
