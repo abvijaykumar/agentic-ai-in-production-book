@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "SupportMax Pro v0.5"
     
     # LLM Configuration
-    OPENAI_API_KEY: Optional[str] = "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" #os.getenv("OPENAI_API_KEY")
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
     
     # Model Selection
