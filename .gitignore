@@ -6,3 +6,5 @@
 *.env
 *venv
 
+/supportmax-pro/v1-mvp/chroma_db
+/supportmax-pro/v1-mvp/logs

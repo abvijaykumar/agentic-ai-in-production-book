@@ -123,6 +123,19 @@ if prompt:
             with st.expander("🔍 Agent Internals", expanded=True):
                 st.info(f"Action Taken: **{action_metadata['action_taken']}**")
                 st.json(action_metadata['details'])
+                
+                # --- NEW: Live Agent Logs ---
+                st.markdown("### 📜 Live Agent Logs")
+                log_file_path = "logs/api_service.log"
+                if os.path.exists(log_file_path):
+                    with open(log_file_path, "r") as f:
+                        # Read last 200 lines to avoid huge payload
+                        lines = f.readlines()
+                        last_lines = lines[-200:]
+                        log_content = "".join(last_lines)
+                        st.code(log_content, language="text")
+                else:
+                    st.caption("No logs available yet.")
         
     st.session_state.messages.append({
         "role": "assistant", 

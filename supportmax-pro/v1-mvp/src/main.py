@@ -49,12 +49,17 @@ def main():
         # but the docker-compose said 8000. Let's check endpoints.py again.
         # It had `uvicorn.run(..., port=8001)`.
         
+        # ensure logs directory exists
+        os.makedirs("logs", exist_ok=True)
+        log_file = open("logs/api_service.log", "w")
+
         api_process = subprocess.Popen(
             [python_exe, api_script],
             cwd=project_root,
             env=env,
-            stdout=sys.stdout,
-            stderr=sys.stderr
+            stdout=log_file,
+            stderr=subprocess.STDOUT, # Redirect stderr to stdout
+            text=True # Ensure text mode if needed, though with file object it handles bytes usually. Actually file opened in text mode 'w' defaults to text.
         )
         processes.append(api_process)
         
