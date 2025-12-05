@@ -1,0 +1,29 @@
+[
+  {
+    "id": "cca289a4",
+    "subject": "User is requesting information on where to find bi...",
+    "description": "User is requesting information on where to find billing information.",
+    "priority": "Normal",
+    "status": "Open",
+    "created_at": "2025-12-05T08:33:31.025276",
+    "contact_email": null
+  },
+  {
+    "id": "de2521ff",
+    "subject": "User needs assistance with resetting their passwor...",
+    "description": "User needs assistance with resetting their password.",
+    "priority": "Normal",
+    "status": "Open",
+    "created_at": "2025-12-05T08:34:19.493283",
+    "contact_email": null
+  },
+  {
+    "id": "62085926",
+    "subject": "User with email leaks@company.com needs help with ...",
+    "description": "User with email leaks@company.com needs help with billing.",
+    "priority": "Normal",
+    "status": "Open",
+    "created_at": "2025-12-05T08:41:58.048642",
+    "contact_email": null
+  }
+]

@@ -1,0 +1,8 @@
+.DS_Store
+/supportmax-pro/db
+/supportmax-pro/logs
+*.lock
+*__pycache__
+*.env
+*venv
+

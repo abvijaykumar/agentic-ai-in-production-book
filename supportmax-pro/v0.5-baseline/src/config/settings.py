@@ -1,0 +1,30 @@
+import os
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+class Settings(BaseSettings):
+    """
+    Application settings and configuration.
+    """
+    # API Configuration
+    API_V1_STR: str = "/api/v1"
+    PROJECT_NAME: str = "SupportMax Pro v0.5"
+    
+    # LLM Configuration
+    OPENAI_API_KEY: Optional[str] = "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" #os.getenv("OPENAI_API_KEY")
+    ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
+    
+    # Model Selection
+    # Options: "openai" or "anthropic"
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "openai")
+    OPENAI_MODEL: str = "gpt-4-turbo-preview"
+    ANTHROPIC_MODEL: str = "claude-3-sonnet-20240229"
+    
+    # Logging
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+
+    class Config:
+        case_sensitive = True
+        env_file = ".env"
+
+settings = Settings()

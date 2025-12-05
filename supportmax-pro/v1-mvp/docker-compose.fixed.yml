@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: supportmax-postgres
+    environment:
+      POSTGRES_DB: supportmax
+      POSTGRES_USER: supportmax
+      POSTGRES_PASSWORD: supportmax_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_/var/lib/postgresql/data
+      - ./deployment/init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supportmax"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - supportmax-network
+
+  # Redis for caching and queue
+  redis:
+    image: redis:7-alpine
+    container_name: supportmax-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - supportmax-network
+
+  # API Server
+  api:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile.api
+    container_name: supportmax-api
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://supportmax:supportmax_password@postgres:5432/supportmax
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - supportmax-network
+    restart: unless-stopped
+
+  # Celery Worker for background tasks
+  worker:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile.worker
+    container_name: supportmax-worker
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://supportmax:supportmax_password@postgres:5432/supportmax
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    volumes:
+      - ./src:/app/src:ro
+      - .//app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - supportmax-network
+    restart: unless-stopped
+
+  # Celery Beat for scheduled tasks
+  beat:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile.worker
+    container_name: supportmax-beat
+    command: celery -A src.queue.tasks beat --loglevel=info
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://supportmax:supportmax_password@postgres:5432/supportmax
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    volumes:
+      - ./src:/app/src:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - supportmax-network
+    restart: unless-stopped
+
+  # Frontend Dashboard (Optional)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: supportmax-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - supportmax-network
+    restart: unless-stopped
+
+volumes:
+  postgres_
+    driver: local
+  redis_
+    driver: local
+
+networks:
+  supportmax-network:
+    driver: bridge

@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  agent-v0.5:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    ports:
+      - "8000:8000" # API
+      - "8501:8501" # Streamlit
+    env_file:
+      - ../config/.env
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    volumes:
+      - ../src:/app/src
+    restart: unless-stopped
